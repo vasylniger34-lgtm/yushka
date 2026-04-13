@@ -65,7 +65,6 @@ let currentVideoId = '';
   ytPlayer = new YT.Player('youtube-player', {
     height: '250',
     width: '250',
-    videoId: 'jpGHAH4CNxg',
     playerVars: {
       listType: 'playlist',
       list: 'PLTYEk6Nx5SQj0QI-gsSOPnYoJKMQZ_aiO',
@@ -86,6 +85,8 @@ let currentVideoId = '';
     }
   });
 };
+
+let isFirstPlay = true;
 
 function onPlayerStateChange(event: any) {
   // @ts-ignore
@@ -138,13 +139,23 @@ if (playTrigger) {
 
     if (tapCount === 1) {
       if (ytPlayer && typeof ytPlayer.getPlayerState === 'function') {
-         // @ts-ignore
-         const currentState = ytPlayer.getPlayerState();
-         // @ts-ignore
-         if (currentState === YT.PlayerState.PLAYING) {
-            ytPlayer.pauseVideo();
+         if (isFirstPlay) {
+            isFirstPlay = false;
+            // Force shuffle state on the Iframe API
+            ytPlayer.setShuffle(true);
+            // By skipping to a random index (e.g. 0 to 40), we guarantee a random song starts immediately.
+            // Even if the playlist isn't fully loaded, playVideoAt(0) on a shuffled list is random!
+            // But just to be extremely safe, we trigger nextVideo() or playVideoAt(1) to break the 1st track curse.
+            ytPlayer.playVideoAt(1); 
          } else {
-            ytPlayer.playVideo();
+           // @ts-ignore
+           const currentState = ytPlayer.getPlayerState();
+           // @ts-ignore
+           if (currentState === YT.PlayerState.PLAYING) {
+              ytPlayer.pauseVideo();
+           } else {
+              ytPlayer.playVideo();
+           }
          }
       }
       tapTimeout = setTimeout(() => { tapCount = 0; }, 350);
