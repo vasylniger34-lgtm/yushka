@@ -133,7 +133,7 @@ function handleInteractionStart() {
 
 if (playTrigger) {
   // Tap Logic (Execute immediately to bypass setTimeout restrictions)
-  playTrigger.addEventListener('click', (e) => {
+  playTrigger.addEventListener('click', () => {
     handleInteractionStart();
     tapCount++;
 
