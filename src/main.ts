@@ -116,47 +116,80 @@ function onPlayerStateChange(event: any) {
   }
 }
 
-// Vinyl Play Trigger Interaction (Multi-Tap Logic)
+// Vinyl Play Trigger Interaction (Multi-Tap & Drag Logic)
 let tapCount = 0;
 let tapTimeout: any;
 
-if (playTrigger) {
-  playTrigger.addEventListener('click', () => {
-    // Hide spin instruction organically on first interaction
-    if (spinInstruction && !spinInstruction.classList.contains('hidden')) {
-      spinInstruction.classList.add('hidden');
-    }
+// Drag logic
+let isDragging = false;
+let startX = 0;
 
+function handleInteractionStart() {
+  if (spinInstruction && !spinInstruction.classList.contains('hidden')) {
+    spinInstruction.classList.add('hidden');
+  }
+}
+
+function handleSwipePlay() {
+  if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
+    // @ts-ignore
+    if (ytPlayer.getPlayerState() !== YT.PlayerState.PLAYING) {
+      ytPlayer.playVideo();
+    }
+  }
+}
+
+if (playTrigger) {
+  // Mobile Safari requires synchronous audio calls on trusted events.
+  // Tap Logic (Execute immediately to bypass setTimeout restrictions)
+  playTrigger.addEventListener('click', (e) => {
+    // If it was a deep drag/swipe, ignore the click to avoid double triggering
+    if (isDragging) return;
+    
+    handleInteractionStart();
     tapCount++;
+
     if (tapCount === 1) {
-      tapTimeout = setTimeout(() => {
-        // 1 Tap: Play/Pause
-        tapCount = 0;
-        if (ytPlayer) {
-           // @ts-ignore
-           if (ytPlayer.getPlayerState() === YT.PlayerState.PLAYING) {
-              ytPlayer.pauseVideo();
-           } else {
-              ytPlayer.playVideo();
-           }
-        }
-      }, 300);
+      if (ytPlayer && typeof ytPlayer.getPlayerState === 'function') {
+         // @ts-ignore
+         if (ytPlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+            ytPlayer.pauseVideo();
+         } else {
+            ytPlayer.playVideo();
+         }
+      }
+      tapTimeout = setTimeout(() => { tapCount = 0; }, 350);
     } else if (tapCount === 2) {
       clearTimeout(tapTimeout);
-      tapTimeout = setTimeout(() => {
-        // 2 Taps: Next Track
-        tapCount = 0;
-        if (ytPlayer) ytPlayer.nextVideo();
-      }, 300);
+      if (ytPlayer && typeof ytPlayer.nextVideo === 'function') ytPlayer.nextVideo();
+      tapTimeout = setTimeout(() => { tapCount = 0; }, 350);
     } else if (tapCount >= 3) {
       clearTimeout(tapTimeout);
-      // 3 Taps: Prev Track / Restart
+      if (ytPlayer && typeof ytPlayer.previousVideo === 'function') ytPlayer.previousVideo();
       tapCount = 0;
-      if (ytPlayer) {
-        ytPlayer.previousVideo();
-      }
     }
   });
+
+  // Re-add Drag/Swipe logic since instruction says "Pull to Spin"
+  const handleDragStart = (x: number) => {
+    isDragging = false; // reset
+    startX = x;
+    handleInteractionStart();
+  };
+
+  const handleDragMove = (x: number) => {
+    const diff = x - startX;
+    if (Math.abs(diff) > 40) {
+      isDragging = true;
+      handleSwipePlay();
+    }
+  };
+
+  playTrigger.addEventListener('mousedown', (e) => handleDragStart(e.clientX));
+  playTrigger.addEventListener('mousemove', (e) => { if (e.buttons > 0) handleDragMove(e.clientX); });
+  
+  playTrigger.addEventListener('touchstart', (e) => handleDragStart(e.touches[0].clientX), { passive: true });
+  playTrigger.addEventListener('touchmove', (e) => handleDragMove(e.touches[0].clientX), { passive: true });
 }
 
 // Info Modal Logic
