@@ -4,17 +4,48 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ЮШКА</title>
+    <link rel="icon" type="image/svg+xml" href="/yushka-logo.svg" />
     <link rel="stylesheet" href="/src/style.css" />
     <!-- Rebellious font for title and standard font for other things -->
     <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
   </head>
   <body>
-    <div class="app-container">
+    <!-- Desktop Background Soup Images -->
+    <div class="desktop-soup-bg" id="desktop-soup-bg"></div>
+
+    <!-- Hidden Side Menu -->
+    <div class="side-menu" id="side-menu">
+      <div class="menu-content">
+        <button class="close-menu-btn" id="close-menu-btn" aria-label="Close">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+        <h2 class="menu-title">НАЛАШТУВАННЯ</h2>
+        
+        <div class="menu-item">
+          <label for="volume-slider">Гучність (Системна)</label>
+          <input type="range" id="volume-slider" min="0" max="100" value="100">
+        </div>
+        
+        <div class="menu-item">
+          <button id="reset-tracks-btn" class="action-btn">Ресет Треків</button>
+        </div>
+        
+        <div class="menu-item">
+          <a href="https://send.monobank.ua/jar/2JbpBYkhMv" target="_blank" class="donate-btn">БЛАГЕ ДІЛО 🤍</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="app-container" id="app-container">
       
       <!-- Top / Navigation -->
       <nav class="nav-bar">
         <h1 class="logo-text">ЮШКА</h1>
-        <button class="menu-btn" aria-label="Menu">
+        <button class="menu-btn" id="menu-btn" aria-label="Menu">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="3" y1="12" x2="21" y2="12"></line>
             <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -33,7 +64,19 @@
             <div class="vinyl-hole"></div>
           </div>
         </div>
+        <div class="spin-instruction" id="spin-instruction">Потягни щоб закрутити</div>
       </main>
+
+      <!-- Infinite Mobile Soup Section -->
+      <div class="mobile-infinite-scroll" id="mobile-infinite-scroll">
+        <!-- JS will populate soups here as you scroll -->
+      </div>
+      
+      <button class="up-btn hidden" id="up-btn" aria-label="Back to top">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="18 15 12 9 6 15"></polyline>
+        </svg>
+      </button>
 
       <!-- Spotify Iframe Wrapper (Hidden completely but functional) -->
       <!-- Opacity 0.01 prevents the browser from discarding it on mobile -->

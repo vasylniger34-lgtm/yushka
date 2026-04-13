@@ -217,3 +217,237 @@ body {
 .vinyl-container:not(.paused) {
   box-shadow: 0 35px 60px -15px rgba(214, 48, 49, 0.2), 0 25px 50px -12px rgba(0, 0, 0, 0.2);
 }
+
+/* Spin Instruction */
+.spin-instruction {
+  margin-top: 3rem;
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1.2rem;
+  color: #d63031;
+  opacity: 0.7;
+  pointer-events: none;
+  animation: pulse 2s infinite ease-in-out;
+  transition: opacity 0.5s ease;
+}
+
+.spin-instruction.hidden {
+  opacity: 0;
+  animation: none;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.7; }
+}
+
+/* Side Menu */
+.side-menu {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 100%;
+  max-width: 400px;
+  height: 100vh;
+  background-color: var(--bg-color-1);
+  box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+  z-index: 1000;
+  transition: right 0.4s cubic-bezier(0.77, 0, 0.175, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.side-menu.open {
+  right: 0;
+}
+
+.menu-content {
+  padding: 3rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.close-menu-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  align-self: flex-end;
+  color: var(--text-dark);
+  padding: 0.5rem;
+  transition: transform 0.2s;
+}
+
+.close-menu-btn:hover {
+  transform: scale(1.1) rotate(90deg);
+}
+
+.menu-title {
+  font-family: system-ui, -apple-system, sans-serif;
+  font-weight: 800;
+  letter-spacing: 2px;
+  font-size: 1.5rem;
+  color: var(--text-dark);
+  margin-bottom: 1rem;
+}
+
+.menu-item {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.menu-item label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  color: #636e72;
+}
+
+/* Range slider styling */
+input[type=range] {
+  -webkit-appearance: none;
+  width: 100%;
+  background: transparent;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 20px; width: 20px;
+  border-radius: 50%;
+  background: #d63031;
+  cursor: pointer;
+  margin-top: -8px;
+}
+input[type=range]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 4px;
+  cursor: pointer;
+  background: #dfe6e9;
+  border-radius: 2px;
+}
+
+.action-btn {
+  padding: 1rem;
+  border: 2px solid var(--text-dark);
+  background: transparent;
+  color: var(--text-dark);
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.2s;
+}
+
+.action-btn:hover {
+  background: var(--text-dark);
+  color: var(--bg-color-1);
+}
+
+.donate-btn {
+  padding: 1rem;
+  background: #d63031;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 15px rgba(214, 48, 49, 0.4);
+  transition: all 0.2s;
+}
+
+.donate-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(214, 48, 49, 0.6);
+}
+
+/* Background Soup & Infinite Scroll */
+.desktop-soup-bg {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 1; /* Below everything */
+  overflow: hidden;
+  display: none; /* hidden on mobile by default */
+}
+
+.soup-bg-item {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  object-fit: contain;
+  opacity: 0.15;
+  transform-origin: center;
+}
+
+.mobile-infinite-scroll {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  padding: 4rem 0;
+  width: 100%;
+  z-index: 5;
+}
+
+.mobile-soup-item {
+  width: 180px;
+  height: 180px;
+  object-fit: contain;
+  opacity: 0.2;
+}
+
+.up-btn {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background: var(--text-dark);
+  color: white;
+  border: none;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  z-index: 100;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.up-btn.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(20px);
+}
+
+@media (min-width: 768px) {
+  .desktop-soup-bg {
+    display: block;
+  }
+  .mobile-infinite-scroll {
+    display: none;
+  }
+  .app-container {
+    height: 100vh;
+    overflow: hidden;
+  }
+}
+@media (max-width: 767px) {
+  /* On mobile, allow scrolling */
+  body {
+    overflow-y: auto;
+    display: block;
+  }
+  .app-container {
+    height: auto;
+    min-height: 100vh;
+  }
+  .player-wrapper {
+    height: 70vh; /* Keep vinyl in first viewport */
+  }
+}

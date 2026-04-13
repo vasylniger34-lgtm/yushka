@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+  <rect width="500" height="500" fill="#ffffff" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&amp;display=swap');
+  </style>
+  <text x="50%" y="55%" font-family="'Permanent Marker', cursive, sans-serif" font-size="110" fill="#d63031" text-anchor="middle" dominant-baseline="middle" transform="rotate(-5, 250, 250)">ЮШКА</text>
+</svg>
