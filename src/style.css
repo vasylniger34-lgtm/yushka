@@ -252,38 +252,44 @@ body {
   100% { transform: scale(1); opacity: 0.7; }
 }
 
-/* Side Menu */
+/* Side Menu (Modal Popup) */
 .side-menu {
-  position: fixed;
-  top: 0;
-  right: -100%;
-  width: 100%;
-  max-width: 400px;
-  height: 100vh;
-  background-color: var(--bg-color-1);
-  box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(253, 251, 251, 0.9);
   z-index: 1000;
-  transition: right 0.4s cubic-bezier(0.77, 0, 0.175, 1);
   display: flex;
-  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transition: opacity 0.3s;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .side-menu.open {
-  right: 0;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .menu-content {
-  padding: 3rem 2rem;
+  background: white;
+  width: 90%;
+  max-width: 350px;
+  padding: 2rem;
   display: flex;
   flex-direction: column;
-  gap: 2.5rem;
+  gap: 2rem;
+  border: 4px solid #d63031;
+  border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+  box-shadow: 2px 2px 0px rgba(214, 48, 49, 0.2);
+  position: relative;
+  transform: rotate(1deg); /* Slight tilt for drawn feel */
 }
 
 .close-menu-btn {
+  position: absolute;
+  top: 10px; right: 15px;
   background: none;
-  border: none;
-  cursor: pointer;
-  align-self: flex-end;
   color: #d63031;
   font-family: 'Permanent Marker', cursive;
   font-size: 2rem;
