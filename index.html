@@ -96,16 +96,16 @@
         </svg>
       </button>
 
-      <!-- Spotify Iframe Wrapper (Hidden completely but functional) -->
+      <!-- Youtube Iframe Wrapper (Hidden completely but functional) -->
       <!-- Opacity 0.01 prevents the browser from discarding it on mobile -->
-      <div class="spotify-embed-container">
-        <div id="embed-iframe"></div>
+      <div class="youtube-embed-container" style="position: absolute; opacity: 0.01; pointer-events: none; z-index: -100; bottom: 0; left: 0; width: 10px; height: 10px; overflow: hidden;">
+        <div id="youtube-player"></div>
       </div>
       
     </div>
 
     <!-- Load our script -->
     <script type="module" src="/src/main.ts"></script>
-    <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
+    <script src="https://www.youtube.com/iframe_api"></script>
   </body>
 </html>

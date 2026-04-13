@@ -5,7 +5,7 @@ declare global {
   }
 }
 
-const PLAYLIST_URI = 'spotify:playlist:0BzGYDgDyAX4yyVTxazV2U';
+
 
 // Elements
 const vinylContainer = document.getElementById('vinyl-container');
@@ -30,9 +30,9 @@ const upBtn = document.getElementById('up-btn');
 
 const vinyl = document.getElementById('vinyl');
 
-let currentPlayingURI = '';
-let embedController: any = null;
-let isFirstPlay = true;
+
+
+
 
 // Vinyl Spin Animation Logic
 let currentRotation = 0;
@@ -56,63 +56,65 @@ function animateVinyl() {
 }
 requestAnimationFrame(animateVinyl);
 
-window.onSpotifyIframeApiReady = (IFrameAPI: any) => {
-  const element = document.getElementById('embed-iframe');
-  if (!element) return;
+// YouTube API Integration
+let ytPlayer: any = null;
+let currentVideoId = '';
 
-  const options = {
-    uri: PLAYLIST_URI,
-    width: '100%',
-    height: '152',
-    theme: '0', 
-  };
-
-  const callback = (EmbedController: any) => {
-    embedController = EmbedController;
-
-    EmbedController.addListener('playback_update', (e: any) => {
-      const state = e.data;
-      
-      // Update vinyl animation state
-      if (state.isPaused || state.isBuffering) {
-        targetSpeed = 0;
-        vinylContainer?.classList.add('paused');
-      } else {
-        vinylContainer?.classList.remove('paused');
-        
-        // Quick spin up effect
-        if (targetSpeed === 0) {
-          targetSpeed = 12; // accelerate fast
-          setTimeout(() => { if (!vinylContainer?.classList.contains('paused')) targetSpeed = 1.8; }, 600); // settle
-        } else {
-          targetSpeed = 1.8; // default steady spin velocity
-        }
-        
-        if (spinInstruction && !spinInstruction.classList.contains('hidden')) {
-          spinInstruction.classList.add('hidden');
-        }
-      }
-
-      // Update track cover if the track changed
-      if (state.playingURI && state.playingURI !== currentPlayingURI) {
-        currentPlayingURI = state.playingURI;
-        updateTrackMetadata(state.playingURI);
-        
-        // Simulating "Shuffle" organically by skipping ahead initially
-        if (isFirstPlay) {
-           isFirstPlay = false;
-           // Wait slightly then jump tracks randomly to simulate a shuffled fresh start
-           const jumps = Math.floor(Math.random() * 4) + 1; // skip 1 to 4 tracks
-           for (let i = 0; i < jumps; i++) {
-             setTimeout(() => { if (embedController) embedController.next(); }, i * 400);
-           }
-        }
-      }
-    });
-  };
-
-  IFrameAPI.createController(element, options, callback);
+(window as any).onYouTubeIframeAPIReady = () => {
+  // @ts-ignore
+  ytPlayer = new YT.Player('youtube-player', {
+    height: '10',
+    width: '10',
+    playerVars: {
+      listType: 'playlist',
+      list: 'PLTYEk6Nx5SQj0QI-gsSOPnYoJKMQZ_aiO',
+      controls: 0,
+      disablekb: 1,
+      fs: 0,
+      rel: 0
+    },
+    events: {
+      'onReady': (event: any) => {
+        // Player ready
+        event.target.setShuffle(true);
+      },
+      'onStateChange': onPlayerStateChange
+    }
+  });
 };
+
+function onPlayerStateChange(event: any) {
+  // @ts-ignore
+  const state = event.data;
+  // @ts-ignore
+  if (state === YT.PlayerState.PLAYING) {
+    vinylContainer?.classList.remove('paused');
+    
+    // Quick spin up effect
+    if (targetSpeed === 0) {
+      targetSpeed = 12; // accelerate fast
+      setTimeout(() => { if (!vinylContainer?.classList.contains('paused')) targetSpeed = 1.8; }, 600); // settle
+    } else {
+      targetSpeed = 1.8; // default steady spin velocity
+    }
+    
+    if (spinInstruction && !spinInstruction.classList.contains('hidden')) {
+      spinInstruction.classList.add('hidden');
+    }
+
+    // Update track cover if video changed
+    let videoData = ytPlayer.getVideoData();
+    if (videoData && videoData.video_id !== currentVideoId) {
+      currentVideoId = videoData.video_id;
+      trackCover.src = `https://img.youtube.com/vi/${currentVideoId}/hqdefault.jpg`;
+      trackCover.classList.remove('hidden');
+    }
+  // @ts-ignore
+  } else if (state === YT.PlayerState.PAUSED || state === YT.PlayerState.BUFFERING) {
+    targetSpeed = 0;
+    vinylContainer?.classList.add('paused');
+  }
+}
 
 // Vinyl Play Trigger Interaction (Multi-Tap Logic)
 let tapCount = 0;
@@ -130,22 +132,28 @@ if (playTrigger) {
       tapTimeout = setTimeout(() => {
         // 1 Tap: Play/Pause
         tapCount = 0;
-        if (embedController) embedController.togglePlay();
+        if (ytPlayer) {
+           // @ts-ignore
+           if (ytPlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+              ytPlayer.pauseVideo();
+           } else {
+              ytPlayer.playVideo();
+           }
+        }
       }, 300);
     } else if (tapCount === 2) {
       clearTimeout(tapTimeout);
       tapTimeout = setTimeout(() => {
         // 2 Taps: Next Track
         tapCount = 0;
-        if (embedController) embedController.next(); // Currently Spotify IFrame API support varies, preparing for YouTube!
+        if (ytPlayer) ytPlayer.nextVideo();
       }, 300);
     } else if (tapCount >= 3) {
       clearTimeout(tapTimeout);
       // 3 Taps: Prev Track / Restart
       tapCount = 0;
-      if (embedController) {
-        // We do seek(0) to restart track since prev() is unstable on spotify
-        embedController.seek(0);
+      if (ytPlayer) {
+        ytPlayer.previousVideo();
       }
     }
   });
@@ -157,32 +165,6 @@ if (infoBtn && infoModal && closeInfoBtn) {
   closeInfoBtn.addEventListener('click', () => infoModal.classList.add('hidden'));
 }
 
-// Function to fetch and update the track cover using Spotify's public oEmbed API
-async function updateTrackMetadata(uri: string) {
-  if (!uri.includes(':track:')) return;
-
-  try {
-    const oembedUrl = `https://open.spotify.com/oembed?url=${encodeURIComponent(uri)}`;
-    const response = await fetch(oembedUrl);
-    
-    if (response.ok) {
-      const data = await response.json();
-      if (data.thumbnail_url) {
-        // Morph the image with a CSS transition!
-        trackCover.src = data.thumbnail_url;
-        trackCover.classList.remove('hidden');
-      } else {
-        trackCover.classList.add('hidden');
-      }
-    } else {
-      trackCover.classList.add('hidden');
-    }
-  } catch (error) {
-    console.error('Failed to fetch track metadata:', error);
-    trackCover.classList.add('hidden');
-  }
-}
-
 // Menu Logic
 if (menuBtn && sideMenu && closeMenuBtn) {
   menuBtn.addEventListener('click', () => sideMenu.classList.add('open'));
@@ -192,21 +174,19 @@ if (menuBtn && sideMenu && closeMenuBtn) {
 // Reset tracks logic
 if (resetTracksBtn) {
   resetTracksBtn.addEventListener('click', () => {
-    if (embedController) {
-      // Reloading the URI effectively resets the playlist play context
-      embedController.loadUri(PLAYLIST_URI);
-      embedController.play();
+    if (ytPlayer) {
+      ytPlayer.playVideoAt(0);
       sideMenu?.classList.remove('open');
     }
   });
 }
 
-// Volume Slider logic (Placeholder mostly since Free Embed API doesn't support setVolume)
+// Volume Slider logic
 if (volumeSlider) {
   volumeSlider.addEventListener('input', (e) => {
-    // If future support exists, we can call embedController.setVolume
-    // Currently, we just let it slide for UI visual representation
-    console.log('Volume changed to', (e.target as HTMLInputElement).value);
+    if (ytPlayer) {
+      ytPlayer.setVolume(Number((e.target as HTMLInputElement).value));
+    }
   });
 }
 
