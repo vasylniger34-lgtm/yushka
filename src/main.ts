@@ -20,6 +20,10 @@ const resetTracksBtn = document.getElementById('reset-tracks-btn');
 // @ts-ignore
 const volumeSlider = document.getElementById('volume-slider') as HTMLInputElement;
 
+const infoBtn = document.getElementById('info-btn');
+const infoModal = document.getElementById('info-modal');
+const closeInfoBtn = document.getElementById('close-info-btn');
+
 const mobileInfiniteScroll = document.getElementById('mobile-infinite-scroll');
 const desktopSoupBg = document.getElementById('desktop-soup-bg');
 const upBtn = document.getElementById('up-btn');
@@ -110,49 +114,47 @@ window.onSpotifyIframeApiReady = (IFrameAPI: any) => {
   IFrameAPI.createController(element, options, callback);
 };
 
-// Vinyl Play Trigger Interaction (simulating swipe/spin by dragging)
-let isDragging = false;
-let startX = 0;
+// Vinyl Play Trigger Interaction (Multi-Tap Logic)
+let tapCount = 0;
+let tapTimeout: any;
 
 if (playTrigger) {
-  // Simple click to toggle
   playTrigger.addEventListener('click', () => {
-    if (embedController) {
-      embedController.togglePlay();
+    // Hide spin instruction organically on first interaction
+    if (spinInstruction && !spinInstruction.classList.contains('hidden')) {
+      spinInstruction.classList.add('hidden');
+    }
+
+    tapCount++;
+    if (tapCount === 1) {
+      tapTimeout = setTimeout(() => {
+        // 1 Tap: Play/Pause
+        tapCount = 0;
+        if (embedController) embedController.togglePlay();
+      }, 300);
+    } else if (tapCount === 2) {
+      clearTimeout(tapTimeout);
+      tapTimeout = setTimeout(() => {
+        // 2 Taps: Next Track
+        tapCount = 0;
+        if (embedController) embedController.next(); // Currently Spotify IFrame API support varies, preparing for YouTube!
+      }, 300);
+    } else if (tapCount >= 3) {
+      clearTimeout(tapTimeout);
+      // 3 Taps: Prev Track / Restart
+      tapCount = 0;
+      if (embedController) {
+        // We do seek(0) to restart track since prev() is unstable on spotify
+        embedController.seek(0);
+      }
     }
   });
+}
 
-  const handleStart = (x: number) => {
-    isDragging = true;
-    startX = x;
-  };
-
-  const handleMove = (x: number) => {
-    if (!isDragging) return;
-    const diff = x - startX;
-    if (Math.abs(diff) > 30) {
-      // Swiped/dragged enough, start play
-      if (embedController && vinylContainer?.classList.contains('paused')) {
-        embedController.play();
-      }
-      isDragging = false; // reset so we don't spam
-    }
-  };
-
-  const handleEnd = () => {
-    isDragging = false;
-  };
-
-  // Mouse events for Desktop
-  playTrigger.addEventListener('mousedown', (e) => handleStart(e.clientX));
-  playTrigger.addEventListener('mousemove', (e) => handleMove(e.clientX));
-  playTrigger.addEventListener('mouseup', handleEnd);
-  playTrigger.addEventListener('mouseleave', handleEnd);
-
-  // Touch events for Mobile
-  playTrigger.addEventListener('touchstart', (e) => handleStart(e.touches[0].clientX), { passive: true });
-  playTrigger.addEventListener('touchmove', (e) => handleMove(e.touches[0].clientX), { passive: true });
-  playTrigger.addEventListener('touchend', handleEnd);
+// Info Modal Logic
+if (infoBtn && infoModal && closeInfoBtn) {
+  infoBtn.addEventListener('click', () => infoModal.classList.remove('hidden'));
+  closeInfoBtn.addEventListener('click', () => infoModal.classList.add('hidden'));
 }
 
 // Function to fetch and update the track cover using Spotify's public oEmbed API
@@ -220,9 +222,9 @@ const emojis = [
 // Provide desktop scattered grid on sides
 function populateDesktopEmojis() {
   if (!desktopSoupBg) return;
-  const emojiSize = 50; // pixels
-  const xSpacing = window.innerWidth * 0.12; // 12vw spacing
-  const ySpacing = 100;
+  const emojiSize = 80; // Larger emojis 
+  const xSpacing = window.innerWidth * 0.08; // Denser x spacing
+  const ySpacing = 80; // Denser y spacing
   
   const cols = Math.floor(window.innerWidth / xSpacing);
   const rows = Math.floor(window.innerHeight / ySpacing);
@@ -237,7 +239,7 @@ function populateDesktopEmojis() {
       
       // Keep strictly to sides (0 - 20vw OR 80vw - 100vw)
       const xvw = (xPos / window.innerWidth) * 100;
-      if (xvw < 20 || xvw > 75) {
+      if (xvw < 22 || xvw > 78) {
         const img = document.createElement('img');
         img.src = emojis[emojiIndex % emojis.length];
         img.className = 'soup-bg-item';
@@ -252,12 +254,14 @@ function populateDesktopEmojis() {
   }
 }
 
+const handwrittenMessages = ["Люблю тебе ❤️", "Ти топ ✨", "Гарного дня!", "ЮШКА 🍲", "Пахне смачно 🔥", "Свайпай далі 💔"];
+
 // Mobile Infinite Scroll logic grid
 let mobileRowsAppended = 0;
 function appendMobileRows(numRows: number) {
   if (!mobileInfiniteScroll) return;
   
-  const cols = 5; // Fixed cols per row for mobile
+  const cols = 6; // Denser cols per row for mobile
   
   for (let r = 0; r < numRows; r++) {
     const rowDiv = document.createElement('div');
@@ -275,10 +279,19 @@ function appendMobileRows(numRows: number) {
       const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
       img.src = randomEmoji;
       img.className = 'mobile-soup-item';
-      img.style.width = '45px';
-      img.style.height = '45px';
+      img.style.width = '60px'; // Larger on mobile
+      img.style.height = '60px';
       rowDiv.appendChild(img);
     }
+    
+    // Inject custom messages occasionally
+    if (Math.random() > 0.6) {
+      const msg = document.createElement('div');
+      msg.className = 'hand-written-message';
+      msg.innerText = handwrittenMessages[Math.floor(Math.random() * handwrittenMessages.length)];
+      mobileInfiniteScroll.appendChild(msg);
+    }
+
     mobileInfiniteScroll.appendChild(rowDiv);
     mobileRowsAppended++;
   }
