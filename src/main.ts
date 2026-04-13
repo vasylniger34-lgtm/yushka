@@ -81,28 +81,37 @@ if (playTrigger) {
     }
   });
 
-  // Adding touch events to give the illusion of "spinning" the vinyl
-  playTrigger.addEventListener('touchstart', (e) => {
+  const handleStart = (x: number) => {
     isDragging = true;
-    startX = e.touches[0].clientX;
-  }, { passive: true });
+    startX = x;
+  };
 
-  playTrigger.addEventListener('touchmove', (e) => {
+  const handleMove = (x: number) => {
     if (!isDragging) return;
-    const currentX = e.touches[0].clientX;
-    const diff = currentX - startX;
-    if (Math.abs(diff) > 50) {
-      // Swiped enough, start play
+    const diff = x - startX;
+    if (Math.abs(diff) > 30) {
+      // Swiped/dragged enough, start play
       if (embedController && vinylContainer?.classList.contains('paused')) {
         embedController.play();
       }
-      isDragging = false;
+      isDragging = false; // reset so we don't spam
     }
-  }, { passive: true });
+  };
 
-  playTrigger.addEventListener('touchend', () => {
+  const handleEnd = () => {
     isDragging = false;
-  });
+  };
+
+  // Mouse events for Desktop
+  playTrigger.addEventListener('mousedown', (e) => handleStart(e.clientX));
+  playTrigger.addEventListener('mousemove', (e) => handleMove(e.clientX));
+  playTrigger.addEventListener('mouseup', handleEnd);
+  playTrigger.addEventListener('mouseleave', handleEnd);
+
+  // Touch events for Mobile
+  playTrigger.addEventListener('touchstart', (e) => handleStart(e.touches[0].clientX), { passive: true });
+  playTrigger.addEventListener('touchmove', (e) => handleMove(e.touches[0].clientX), { passive: true });
+  playTrigger.addEventListener('touchend', handleEnd);
 }
 
 // Function to fetch and update the track cover using Spotify's public oEmbed API

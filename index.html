@@ -64,7 +64,19 @@
             <div class="vinyl-hole"></div>
           </div>
         </div>
-        <div class="spin-instruction" id="spin-instruction">Потягни щоб закрутити</div>
+        <div class="spin-instruction" id="spin-instruction">
+          <svg viewBox="0 0 300 100" width="100%" height="100%">
+            <!-- A nice curve tracing the bottom of the vinyl -->
+            <path id="curve-path" d="M 30,20 Q 150,90 270,20" fill="transparent" stroke="#d63031" stroke-width="3" stroke-linecap="round"/>
+            <!-- Arrow head at the end -->
+            <polygon points="270,20 255,15 260,30" fill="#d63031" transform="rotate(-15 270 20)"/>
+            <text font-family="'Permanent Marker', cursive" font-size="18" fill="#d63031" letter-spacing="1">
+              <textPath href="#curve-path" startOffset="50%" text-anchor="middle">
+                Потягни щоб закрутити
+              </textPath>
+            </text>
+          </svg>
+        </div>
       </main>
 
       <!-- Infinite Mobile Soup Section -->
