@@ -165,42 +165,94 @@ if (volumeSlider) {
   });
 }
 
-// Infinite Mobile Scroll Logic
-function createSoupElement(isDesktop: boolean = false) {
-  const img = document.createElement('img');
-  img.src = '/soup.svg';
-  if (isDesktop) {
-    img.className = 'soup-bg-item';
-    img.style.top = `${Math.random() * 95}vh`;
-    
-    // Choose randomly to place on left or right side
-    const isLeft = Math.random() > 0.5;
-    if (isLeft) {
-      img.style.left = `${Math.random() * 15}vw`; // Left side
-    } else {
-      img.style.left = `${80 + Math.random() * 15}vw`; // Right side
+// iOS Emoji URLs for "Yushka" vibe
+const emojis = [
+  'https://em-content.zobj.net/source/apple/391/pot-of-food_1f372.png', // Stew/Soup
+  'https://em-content.zobj.net/source/apple/391/bowl-with-spoon_1f963.png', // Bowl
+  'https://em-content.zobj.net/source/apple/391/shallow-pan-of-food_1f958.png', // Pan
+  'https://em-content.zobj.net/source/apple/391/fish_1f41f.png', // Fish
+  'https://em-content.zobj.net/source/apple/391/sparkles_2728.png' // Sparkles
+];
+
+// Provide desktop scattered grid on sides
+function populateDesktopEmojis() {
+  if (!desktopSoupBg) return;
+  const emojiSize = 50; // pixels
+  const xSpacing = window.innerWidth * 0.12; // 12vw spacing
+  const ySpacing = 100;
+  
+  const cols = Math.floor(window.innerWidth / xSpacing);
+  const rows = Math.floor(window.innerHeight / ySpacing);
+
+  let emojiIndex = 0;
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      // Create pattern layout staggered
+      const offsetX = (r % 2 === 0) ? 0 : xSpacing / 2;
+      const xPos = c * xSpacing + offsetX;
+      const yPos = r * ySpacing;
+      
+      // Keep strictly to sides (0 - 20vw OR 80vw - 100vw)
+      const xvw = (xPos / window.innerWidth) * 100;
+      if (xvw < 20 || xvw > 75) {
+        const img = document.createElement('img');
+        img.src = emojis[emojiIndex % emojis.length];
+        img.className = 'soup-bg-item';
+        img.style.top = `${yPos}px`;
+        img.style.left = `${xPos}px`;
+        img.style.width = `${emojiSize}px`;
+        img.style.height = `${emojiSize}px`;
+        desktopSoupBg.appendChild(img);
+        emojiIndex++;
+      }
+    }
+  }
+}
+
+// Mobile Infinite Scroll logic grid
+let mobileRowsAppended = 0;
+function appendMobileRows(numRows: number) {
+  if (!mobileInfiniteScroll) return;
+  
+  const cols = 5; // Fixed cols per row for mobile
+  
+  for (let r = 0; r < numRows; r++) {
+    const rowDiv = document.createElement('div');
+    rowDiv.style.display = 'flex';
+    rowDiv.style.justifyContent = 'space-evenly';
+    rowDiv.style.width = '100%';
+    // stagger logic
+    if (mobileRowsAppended % 2 !== 0) {
+      rowDiv.style.paddingLeft = '5%';
+      rowDiv.style.paddingRight = '5%';
     }
     
-    img.style.transform = `rotate(${Math.random() * 360}deg) scale(${0.5 + Math.random() * 1.5})`;
-  } else {
-    img.className = 'mobile-soup-item';
+    for (let c = 0; c < cols; c++) {
+      const img = document.createElement('img');
+      const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+      img.src = randomEmoji;
+      img.className = 'mobile-soup-item';
+      img.style.width = '45px';
+      img.style.height = '45px';
+      rowDiv.appendChild(img);
+    }
+    mobileInfiniteScroll.appendChild(rowDiv);
+    mobileRowsAppended++;
   }
-  return img;
 }
 
-// Populate desktop background
-if (desktopSoupBg) {
-  for (let i = 0; i < 15; i++) {
-    desktopSoupBg.appendChild(createSoupElement(true));
+populateDesktopEmojis();
+// Recalculate on resize
+window.addEventListener('resize', () => {
+  if (desktopSoupBg && window.innerWidth >= 768) {
+    desktopSoupBg.innerHTML = '';
+    populateDesktopEmojis();
   }
-}
+});
 
-// Populate mobile infinite scroll
 if (mobileInfiniteScroll) {
   // Load initial batch
-  for (let i = 0; i < 10; i++) {
-    mobileInfiniteScroll.appendChild(createSoupElement(false));
-  }
+  appendMobileRows(8);
 
   // Bind scroll for infinite loading
   window.addEventListener('scroll', () => {
@@ -213,9 +265,7 @@ if (mobileInfiniteScroll) {
 
     // Infinite add
     if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
-      for (let i = 0; i < 5; i++) {
-        mobileInfiniteScroll.appendChild(createSoupElement(false));
-      }
+      appendMobileRows(4);
     }
   }, { passive: true });
 }
