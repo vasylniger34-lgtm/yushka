@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="/src/style.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
   </head>
   <body>
     <!-- Desktop Background Soup Images -->
@@ -83,7 +83,7 @@
             <path id="curve-path" d="M 30,20 Q 150,90 270,20" fill="transparent" stroke="#d63031" stroke-width="3" stroke-linecap="round"/>
             <!-- Arrow head at the end -->
             <polygon points="270,20 255,15 260,30" fill="#d63031" transform="rotate(-15 270 20)"/>
-            <text font-family="'Permanent Marker', cursive" font-size="18" fill="#d63031" letter-spacing="1">
+            <text font-family="'Neucha', cursive" font-size="24" fill="#d63031" letter-spacing="2">
               <textPath href="#curve-path" startOffset="50%" text-anchor="middle">
                 ТАПНИ ЩОБ ЗАКРУТИТИ
               </textPath>
@@ -91,6 +91,15 @@
           </svg>
         </div>
       </main>
+
+      <!-- Scroll Hint on Mobile -->
+      <div class="scroll-hint-mobile">
+        ГОРТАЙ ВНИЗ
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <polyline points="19 12 12 19 5 12"></polyline>
+        </svg>
+      </div>
 
       <!-- Infinite Mobile Soup Section -->
       <div class="mobile-infinite-scroll" id="mobile-infinite-scroll">
