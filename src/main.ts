@@ -80,6 +80,12 @@ let currentVideoId = '';
       'onReady': (event: any) => {
         // Player ready
         event.target.setShuffle(true);
+        if ('mediaSession' in navigator) {
+          navigator.mediaSession.setActionHandler('play', () => { if (ytPlayer) ytPlayer.playVideo(); });
+          navigator.mediaSession.setActionHandler('pause', () => { if (ytPlayer) ytPlayer.pauseVideo(); });
+          navigator.mediaSession.setActionHandler('nexttrack', () => { if (ytPlayer) ytPlayer.nextVideo(); });
+          navigator.mediaSession.setActionHandler('previoustrack', () => { if (ytPlayer) ytPlayer.previousVideo(); });
+        }
       },
       'onStateChange': onPlayerStateChange
     }
@@ -111,8 +117,21 @@ function onPlayerStateChange(event: any) {
     let videoData = ytPlayer.getVideoData();
     if (videoData && videoData.video_id !== currentVideoId) {
       currentVideoId = videoData.video_id;
-      trackCover.src = `https://img.youtube.com/vi/${currentVideoId}/hqdefault.jpg`;
+      const thumbnailUrl = `https://img.youtube.com/vi/${currentVideoId}/hqdefault.jpg`;
+      trackCover.src = thumbnailUrl;
       trackCover.classList.remove('hidden');
+      
+      // Update Lock Screen Metadata
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: videoData.title || 'ЮШКА Радіо',
+          artist: videoData.author || 'Невідомий',
+          album: 'ЮШКА Радіо',
+          artwork: [
+            { src: thumbnailUrl, sizes: '480x360', type: 'image/jpeg' }
+          ]
+        });
+      }
     }
   // @ts-ignore
   } else if (state === YT.PlayerState.PAUSED || state === YT.PlayerState.BUFFERING) {

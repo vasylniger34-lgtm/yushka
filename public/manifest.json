@@ -1,0 +1,16 @@
+{
+  "name": "ЮШКА Радіо",
+  "short_name": "ЮШКА",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fdfbfb",
+  "theme_color": "#d63031",
+  "icons": [
+    {
+      "src": "/yushka-logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
