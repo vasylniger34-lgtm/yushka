@@ -229,7 +229,13 @@ function populateDesktopEmojis() {
   }
 }
 
-const handwrittenMessages = ["Люблю тебе ❤️", "Ти топ ✨", "Гарного дня!", "ЮШКА 🍲", "Пахне смачно 🔥", "Свайпай далі 💔"];
+const handwrittenMessages = [
+  "Люблю тебе ❤️", "Ти топ ✨", "Гарного дня!", "ЮШКА - ЦЕ ОФІЦІЙНА БАЗА 🍲", 
+  "Пахне смачно 🔥", "Свайпай далі 💔", "Не лінись, покрути!", "Мам, я діджей 💽", 
+  "Коли зарплата? 🥲", "Цінуй момент", "Хто ти воїн?", "Клікай давай!", 
+  "Пішов ти... слухати ЮШКУ!", "Музика для душі 🎧", "Обняв припідняв 🫂",
+  "Обережно, гаряче! ♨️", "Ідеальний вайб ✅"
+];
 
 // Mobile Infinite Scroll logic grid
 let mobileRowsAppended = 0;
@@ -259,11 +265,27 @@ function appendMobileRows(numRows: number) {
       rowDiv.appendChild(img);
     }
     
-    // Inject custom messages occasionally
-    if (Math.random() > 0.6) {
+    // Inject custom messages occasionally (Much rarer now: ~5% chance per row, which is ~ once every 20-30 rows)
+    if (Math.random() > 0.95) {
       const msg = document.createElement('div');
       msg.className = 'hand-written-message';
       msg.innerText = handwrittenMessages[Math.floor(Math.random() * handwrittenMessages.length)];
+      
+      // Randomize layout alignment
+      const aligns = ['flex-start', 'center', 'flex-end'];
+      const chosenAlign = aligns[Math.floor(Math.random() * aligns.length)];
+      
+      // Set container style overriding default flex column align-items
+      msg.style.alignSelf = chosenAlign;
+      
+      // Crazy tilt (-25deg to +25deg)
+      const rotation = (Math.random() * 50) - 25;
+      msg.style.transform = `rotate(${rotation}deg) scale(${0.8 + Math.random() * 0.4})`;
+      
+      // Occasional random sideways padding
+      msg.style.paddingLeft = `${Math.random() * 20}%`;
+      msg.style.paddingRight = `${Math.random() * 20}%`;
+
       mobileInfiniteScroll.appendChild(msg);
     }
 
