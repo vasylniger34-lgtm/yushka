@@ -116,13 +116,9 @@ function onPlayerStateChange(event: any) {
   }
 }
 
-// Vinyl Play Trigger Interaction (Multi-Tap & Drag Logic)
+// Vinyl Play Trigger Interaction (Multi-Tap Logic)
 let tapCount = 0;
 let tapTimeout: any;
-
-// Drag logic
-let isDragging = false;
-let startX = 0;
 
 function handleInteractionStart() {
   if (spinInstruction && !spinInstruction.classList.contains('hidden')) {
@@ -130,22 +126,9 @@ function handleInteractionStart() {
   }
 }
 
-function handleSwipePlay() {
-  if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
-    // @ts-ignore
-    if (ytPlayer.getPlayerState() !== YT.PlayerState.PLAYING) {
-      ytPlayer.playVideo();
-    }
-  }
-}
-
 if (playTrigger) {
-  // Mobile Safari requires synchronous audio calls on trusted events.
   // Tap Logic (Execute immediately to bypass setTimeout restrictions)
   playTrigger.addEventListener('click', (e) => {
-    // If it was a deep drag/swipe, ignore the click to avoid double triggering
-    if (isDragging) return;
-    
     handleInteractionStart();
     tapCount++;
 
@@ -169,27 +152,6 @@ if (playTrigger) {
       tapCount = 0;
     }
   });
-
-  // Re-add Drag/Swipe logic since instruction says "Pull to Spin"
-  const handleDragStart = (x: number) => {
-    isDragging = false; // reset
-    startX = x;
-    handleInteractionStart();
-  };
-
-  const handleDragMove = (x: number) => {
-    const diff = x - startX;
-    if (Math.abs(diff) > 40) {
-      isDragging = true;
-      handleSwipePlay();
-    }
-  };
-
-  playTrigger.addEventListener('mousedown', (e) => handleDragStart(e.clientX));
-  playTrigger.addEventListener('mousemove', (e) => { if (e.buttons > 0) handleDragMove(e.clientX); });
-  
-  playTrigger.addEventListener('touchstart', (e) => handleDragStart(e.touches[0].clientX), { passive: true });
-  playTrigger.addEventListener('touchmove', (e) => handleDragMove(e.touches[0].clientX), { passive: true });
 }
 
 // Info Modal Logic
