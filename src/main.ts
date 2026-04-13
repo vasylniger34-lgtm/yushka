@@ -63,15 +63,17 @@ let currentVideoId = '';
 (window as any).onYouTubeIframeAPIReady = () => {
   // @ts-ignore
   ytPlayer = new YT.Player('youtube-player', {
-    height: '10',
-    width: '10',
+    height: '250',
+    width: '250',
     playerVars: {
       listType: 'playlist',
       list: 'PLTYEk6Nx5SQj0QI-gsSOPnYoJKMQZ_aiO',
       controls: 0,
       disablekb: 1,
       fs: 0,
-      rel: 0
+      rel: 0,
+      playsinline: 1,
+      enablejsapi: 1
     },
     events: {
       'onReady': (event: any) => {
@@ -135,7 +137,9 @@ if (playTrigger) {
     if (tapCount === 1) {
       if (ytPlayer && typeof ytPlayer.getPlayerState === 'function') {
          // @ts-ignore
-         if (ytPlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+         const currentState = ytPlayer.getPlayerState();
+         // @ts-ignore
+         if (currentState === YT.PlayerState.PLAYING) {
             ytPlayer.pauseVideo();
          } else {
             ytPlayer.playVideo();
