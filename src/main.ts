@@ -24,12 +24,33 @@ const mobileInfiniteScroll = document.getElementById('mobile-infinite-scroll');
 const desktopSoupBg = document.getElementById('desktop-soup-bg');
 const upBtn = document.getElementById('up-btn');
 
+const vinyl = document.getElementById('vinyl');
+
 let currentPlayingURI = '';
 let embedController: any = null;
+let isFirstPlay = true;
 
-// Initial Fallback Cover
-trackCover.src = '/yushka-logo.svg';
-trackCover.classList.remove('hidden');
+// Vinyl Spin Animation Logic
+let currentRotation = 0;
+let currentSpeed = 0;
+let targetSpeed = 0;
+
+function animateVinyl() {
+  if (!vinyl) return;
+  // Smoothly interpolate angular velocity
+  currentSpeed += (targetSpeed - currentSpeed) * 0.05;
+  
+  if (currentSpeed > 0.05) {
+    currentRotation += currentSpeed;
+    vinyl.style.transform = `rotate(${currentRotation}deg)`;
+  } else if (targetSpeed === 0 && currentSpeed > 0) {
+    // Slight drift when stopping
+    currentRotation += currentSpeed;
+    vinyl.style.transform = `rotate(${currentRotation}deg)`;
+  }
+  requestAnimationFrame(animateVinyl);
+}
+requestAnimationFrame(animateVinyl);
 
 window.onSpotifyIframeApiReady = (IFrameAPI: any) => {
   const element = document.getElementById('embed-iframe');
@@ -50,9 +71,19 @@ window.onSpotifyIframeApiReady = (IFrameAPI: any) => {
       
       // Update vinyl animation state
       if (state.isPaused || state.isBuffering) {
+        targetSpeed = 0;
         vinylContainer?.classList.add('paused');
       } else {
         vinylContainer?.classList.remove('paused');
+        
+        // Quick spin up effect
+        if (targetSpeed === 0) {
+          targetSpeed = 12; // accelerate fast
+          setTimeout(() => { if (!vinylContainer?.classList.contains('paused')) targetSpeed = 1.8; }, 600); // settle
+        } else {
+          targetSpeed = 1.8; // default steady spin velocity
+        }
+        
         if (spinInstruction && !spinInstruction.classList.contains('hidden')) {
           spinInstruction.classList.add('hidden');
         }
@@ -62,6 +93,16 @@ window.onSpotifyIframeApiReady = (IFrameAPI: any) => {
       if (state.playingURI && state.playingURI !== currentPlayingURI) {
         currentPlayingURI = state.playingURI;
         updateTrackMetadata(state.playingURI);
+        
+        // Simulating "Shuffle" organically by skipping ahead initially
+        if (isFirstPlay) {
+           isFirstPlay = false;
+           // Wait slightly then jump tracks randomly to simulate a shuffled fresh start
+           const jumps = Math.floor(Math.random() * 4) + 1; // skip 1 to 4 tracks
+           for (let i = 0; i < jumps; i++) {
+             setTimeout(() => { if (embedController) embedController.next(); }, i * 400);
+           }
+        }
       }
     });
   };
@@ -125,16 +166,18 @@ async function updateTrackMetadata(uri: string) {
     if (response.ok) {
       const data = await response.json();
       if (data.thumbnail_url) {
+        // Morph the image with a CSS transition!
         trackCover.src = data.thumbnail_url;
+        trackCover.classList.remove('hidden');
       } else {
-        trackCover.src = '/yushka-logo.svg';
+        trackCover.classList.add('hidden');
       }
     } else {
-      trackCover.src = '/yushka-logo.svg';
+      trackCover.classList.add('hidden');
     }
   } catch (error) {
     console.error('Failed to fetch track metadata:', error);
-    trackCover.src = '/yushka-logo.svg';
+    trackCover.classList.add('hidden');
   }
 }
 
