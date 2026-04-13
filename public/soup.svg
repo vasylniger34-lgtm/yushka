@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Steam -->
+  <path d="M70,80 Q60,50 80,30" fill="none" stroke="#dfe6e9" stroke-width="6" stroke-linecap="round" opacity="0.8">
+    <animate attributeName="d" values="M70,80 Q60,50 80,30; M70,80 Q80,50 70,30; M70,80 Q60,50 80,30" dur="2s" repeatCount="indefinite"/>
+  </path>
+  <path d="M100,70 Q90,40 110,20" fill="none" stroke="#dfe6e9" stroke-width="8" stroke-linecap="round" opacity="0.8">
+    <animate attributeName="d" values="M100,70 Q90,40 110,20; M100,70 Q110,40 100,20; M100,70 Q90,40 110,20" dur="2.5s" repeatCount="indefinite"/>
+  </path>
+  <path d="M130,80 Q120,50 140,30" fill="none" stroke="#dfe6e9" stroke-width="6" stroke-linecap="round" opacity="0.8">
+    <animate attributeName="d" values="M130,80 Q120,50 140,30; M130,80 Q140,50 130,30; M130,80 Q120,50 140,30" dur="2.2s" repeatCount="indefinite"/>
+  </path>
+  
+  <!-- Spoon Handle -->
+  <path d="M165,60 L145,110" stroke="#b2bec3" stroke-width="12" stroke-linecap="round" />
+  
+  <!-- Back of Bowl -->
+  <ellipse cx="100" cy="110" rx="75" ry="25" fill="#bc2323" />
+  
+  <!-- Soup Liquid -->
+  <ellipse cx="100" cy="112" rx="71" ry="21" fill="#fdcb6e" />
+  
+  <!-- Soup Ingredients -->
+  <!-- Carrots -->
+  <circle cx="80" cy="115" r="9" fill="#e17055" />
+  <circle cx="125" cy="110" r="7" fill="#e17055" />
+  <!-- Potatoes -->
+  <rect x="55" y="105" width="12" height="12" rx="3" fill="#FFEAA7" transform="rotate(15 60 110)"/>
+  <rect x="135" y="115" width="14" height="10" rx="2" fill="#FFEAA7" transform="rotate(-20 140 120)"/>
+  <!-- Meat / Fish chunks -->
+  <path d="M100,105 Q115,100 115,115 Q100,120 100,105" fill="#d63031" opacity="0.9" />
+  <!-- Parsley / Herbs -->
+  <circle cx="90" cy="105" r="3" fill="#00b894" />
+  <circle cx="95" cy="108" r="2.5" fill="#00b894" />
+  <circle cx="110" cy="120" r="2" fill="#00b894" />
+  
+  <!-- Spoon Scoop inside bowl -->
+  <ellipse cx="140" cy="120" rx="18" ry="12" fill="#dfe6e9" transform="rotate(-30 140 120)"/>
+  
+  <!-- Front of Bowl -->
+  <path d="M25,110 C25,180 60,195 100,195 C140,195 175,180 175,110 Z" fill="#d63031" />
+  
+  <!-- Bowl Rim highlight -->
+  <ellipse cx="100" cy="110" rx="75" ry="25" fill="none" stroke="#ff7675" stroke-width="4" />
+  <path d="M40,140 Q40,180 100,180" fill="none" stroke="#ff7675" stroke-width="4" stroke-linecap="round" opacity="0.5"/>
+</svg>

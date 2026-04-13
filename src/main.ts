@@ -159,12 +159,20 @@ if (volumeSlider) {
 // Infinite Mobile Scroll Logic
 function createSoupElement(isDesktop: boolean = false) {
   const img = document.createElement('img');
-  img.src = '/soup.png';
+  img.src = '/soup.svg';
   if (isDesktop) {
     img.className = 'soup-bg-item';
-    img.style.top = `${Math.random() * 100}vh`;
-    img.style.left = `${Math.random() * 90}vw`;
-    img.style.transform = `rotate(${Math.random() * 360}deg) scale(${0.5 + Math.random() * 1})`;
+    img.style.top = `${Math.random() * 95}vh`;
+    
+    // Choose randomly to place on left or right side
+    const isLeft = Math.random() > 0.5;
+    if (isLeft) {
+      img.style.left = `${Math.random() * 15}vw`; // Left side
+    } else {
+      img.style.left = `${80 + Math.random() * 15}vw`; // Right side
+    }
+    
+    img.style.transform = `rotate(${Math.random() * 360}deg) scale(${0.5 + Math.random() * 1.5})`;
   } else {
     img.className = 'mobile-soup-item';
   }
