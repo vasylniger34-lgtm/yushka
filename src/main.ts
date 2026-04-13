@@ -65,6 +65,7 @@ let currentVideoId = '';
   ytPlayer = new YT.Player('youtube-player', {
     height: '250',
     width: '250',
+    videoId: 'jpGHAH4CNxg',
     playerVars: {
       listType: 'playlist',
       list: 'PLTYEk6Nx5SQj0QI-gsSOPnYoJKMQZ_aiO',
@@ -73,7 +74,8 @@ let currentVideoId = '';
       fs: 0,
       rel: 0,
       playsinline: 1,
-      enablejsapi: 1
+      enablejsapi: 1,
+      origin: window.location.origin
     },
     events: {
       'onReady': (event: any) => {
